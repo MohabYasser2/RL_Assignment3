@@ -31,7 +31,7 @@ class EnvironmentWrapper:
         "Pendulum-v1"
     ]
     
-    def __init__(self, env_name: str, render_mode: str = None, num_discrete_actions: int = 5, use_discrete_pendulum: bool = False):
+    def __init__(self, env_name: str, render_mode: str = None, num_discrete_actions: int = 5, use_discrete_pendulum: bool = True):
         """
         Initialize the environment wrapper.
         
@@ -39,7 +39,7 @@ class EnvironmentWrapper:
             env_name: Name of the Gymnasium environment
             render_mode: Rendering mode ('human', 'rgb_array', None)
             num_discrete_actions: Number of discrete actions for Pendulum (default: 5)
-            use_discrete_pendulum: Whether to use discrete wrapper for Pendulum (default: False for continuous)
+            use_discrete_pendulum: Whether to use discrete wrapper for Pendulum (default: True)
             
         Raises:
             ValueError: If environment name is not supported
@@ -52,7 +52,7 @@ class EnvironmentWrapper:
         
         self.env_name = env_name
         
-        # Use discrete wrapper for Pendulum only if specified
+        # Use discrete wrapper for Pendulum by default
         if env_name == "Pendulum-v1" and use_discrete_pendulum:
             self.env = make_pendulum(num_discrete_actions=num_discrete_actions, render_mode=render_mode)
         else:

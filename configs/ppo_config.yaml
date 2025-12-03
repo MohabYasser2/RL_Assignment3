@@ -116,22 +116,21 @@ MountainCar-v0:
   max_episodes: 10000
 
 Pendulum-v1:
-  # Pendulum with CONTINUOUS actions (reference parameters)
+  # Pendulum with DISCRETE actions (5 discrete bins from -2 to 2)
   discount_factor: 0.99 # Gamma from reference
   epsilon_decay: 0.995 # unused
 
-  # Optimizer - reference uses separate LR for actor/critic
-  # PPO typically uses single LR, using Actor LR as base
-  learning_rate: 0.0003 # Actor LR: 3e-4 (Critic LR: 1e-3 not used in standard PPO)
+  # Optimizer
+  learning_rate: 0.0003 # 3e-4
 
   # Network architecture
   hidden_dim: 128 # Hidden Dim from reference
 
-  # Rollout collection - reference uses 4096
-  replay_memory_size: 4096 # Rollout Length from reference
+  # Rollout collection
+  replay_memory_size: 4096 # Smaller rollout for discrete actions
 
   # Minibatching
-  batch_size: 128 # 4096 / 32 minibatches = 128
+  batch_size: 128 # 4096 / 32 = 128
   n_epochs: 10 # Standard PPO value
 
   # PPO clipping
@@ -141,8 +140,8 @@ Pendulum-v1:
   # GAE
   gae_lambda: 0.95
 
-  # Loss coefficients - reference entropy
-  entropy_coef: 0.01 # Entropy Coef from reference
+  # Loss coefficients - higher entropy for discrete action exploration
+  entropy_coef: 0.01 # Entropy for discrete exploration
   entropy_coef_final: 0.001 # Gradually reduce
   value_loss_coef: 0.5
   max_grad_norm: 0.5
@@ -150,10 +149,8 @@ Pendulum-v1:
   # Annealing
   total_updates: 10000
 
-  # Convergence - Pendulum solved around -200 to -150
-  convergence_threshold: -200.0 # More conservative threshold
+  # Convergence - Discrete actions achieve around -200 to -250
+  convergence_threshold: -250.0
   convergence_window: 100
   min_episodes: 100
-  max_episodes: 1000 # Training Episodes from reference
-
-  continuous: true
+  max_episodes: 1000

@@ -207,6 +207,7 @@ class PPO:
         self.trajectory_length = config.get('replay_memory_size', 2048)
         self.value_loss_coef = config.get('value_loss_coef', 0.5)
         self.entropy_coef = config.get('entropy_coef', 0.01)
+        self.entropy_coef_final = config.get('entropy_coef_final', self.entropy_coef * 0.1)
         self.max_grad_norm = config.get('max_grad_norm', 0.5)
         self.clip_vloss = config.get('clip_vloss', True)  # Value function clipping
         
@@ -339,12 +340,17 @@ class PPO:
         total_entropy = 0
         total_loss = 0
         n_updates = 0
+        approx_kl = 0.0  # Initialize outside loops
         
         # Multiple epochs of updates
         for epoch in range(self.n_epochs):
             # Create random indices for minibatch sampling
             indices = np.arange(len(states))
             np.random.shuffle(indices)
+            
+            # Track KL for this epoch
+            epoch_approx_kl = 0.0
+            epoch_updates = 0
             
             # Minibatch updates
             for start_idx in range(0, len(states), self.batch_size):
@@ -362,10 +368,11 @@ class PPO:
                 # Evaluate actions with current policy
                 log_probs, values, entropy = self.actor_critic.evaluate_actions(batch_states, batch_actions)
                 
-                # Approximate KL divergence for early stopping
-                approx_kl = (batch_old_log_probs - log_probs).mean().item()
-                if approx_kl > 0.03:  # KL divergence threshold
-                    break  # Stop this epoch early to prevent too large policy updates
+                # Track approximate KL divergence (don't break yet)
+                batch_approx_kl = (batch_old_log_probs - log_probs).mean().item()
+                epoch_approx_kl += batch_approx_kl
+                epoch_updates += 1
+                approx_kl = batch_approx_kl  # Store for logging
                 
                 # Compute ratio: π_θ(a|s) / π_θ_old(a|s)
                 ratio = torch.exp(log_probs - batch_old_log_probs)
@@ -394,7 +401,8 @@ class PPO:
                 # Entropy bonus (for exploration)
                 entropy_loss = -entropy.mean()
                 
-                # Total loss
+                # Total loss (use current entropy coefficient from annealing)
+                # Note: entropy_coef will be computed after the loop, so use self.entropy_coef for now
                 loss = actor_loss + self.value_loss_coef * critic_loss + self.entropy_coef * entropy_loss
                 
                 # Optimize
@@ -409,13 +417,23 @@ class PPO:
                 total_entropy += entropy.mean().item()
                 total_loss += loss.item()
                 n_updates += 1
+            
+            # Check KL divergence after each epoch (not per minibatch)
+            if epoch_updates > 0:
+                avg_epoch_kl = epoch_approx_kl / epoch_updates
+                if avg_epoch_kl > 0.05:  # Higher threshold: 0.05 instead of 0.03
+                    # Policy changed too much, stop further epochs
+                    break
         
-        # Learning rate annealing
+        # Learning rate and entropy annealing
         self.update_step += 1
         frac = 1.0 - (self.update_step / self.total_updates)
         new_lr = self.lr * max(frac, 0.0)  # Don't go below 0
         for g in self.optimizer.param_groups:
             g['lr'] = new_lr
+        
+        # Anneal entropy coefficient (high early for exploration, low late for convergence)
+        current_entropy_coef = self.entropy_coef_final + (self.entropy_coef - self.entropy_coef_final) * frac
         
         # Average losses
         return {
@@ -424,6 +442,7 @@ class PPO:
             'entropy': total_entropy / n_updates,
             'total_loss': total_loss / n_updates,
             'learning_rate': new_lr,
+            'entropy_coef': current_entropy_coef,
             'approx_kl': approx_kl if n_updates > 0 else 0.0
         }
     

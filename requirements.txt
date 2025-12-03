@@ -1,0 +1,8 @@
+gymnasium==0.29.1
+gymnasium[box2d]==0.29.1
+torch==2.1.0
+numpy==1.24.3
+wandb==0.16.0
+pyyaml==6.0.1
+matplotlib==3.8.0
+tqdm==4.66.1

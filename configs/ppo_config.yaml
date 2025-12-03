@@ -1,0 +1,75 @@
+# PPO Configuration for different environments
+# Proximal Policy Optimization algorithm hyperparameters
+
+CartPole-v1:
+  discount_factor: 0.99 # gamma
+  epsilon_decay: 0.995 # unused, leave as-is
+
+  # Optimizer
+  learning_rate: 0.00025 # CleanRL LR (2.5e-4)
+
+  # Rollout collection
+  replay_memory_size: 2048 # num_steps (CleanRL default)
+
+  # Minibatching (CleanRL uses num_minibatches=32 → minibatch=64)
+  batch_size: 64 # 2048 / 32 = 64 EXACT
+  n_epochs: 10 # CleanRL update_epochs=10
+
+  # PPO core
+  clip_range: 0.2 # epsilon for clipping
+  clip_vloss: true # Value function clipping (CleanRL default)
+  gae_lambda: 0.95 # λ for GAE
+  entropy_coef: 0.01 # CleanRL default ENT COEF
+  value_loss_coef: 0.5 # CleanRL default
+  max_grad_norm: 0.5 # CleanRL default
+
+  # Learning rate annealing
+  total_updates: 2500 # Estimated updates for convergence (5000 max_episodes / 2)
+
+  # Convergence criteria (CleanRL does not use this, but keep your logic)
+  convergence_threshold: 475.0
+  convergence_window: 100
+  min_episodes: 200
+  max_episodes: 5000
+
+Acrobot-v1:
+  discount_factor: 0.99
+  epsilon_decay: 0.995
+  learning_rate: 0.0003
+  replay_memory_size: 2048
+  batch_size: 64
+  n_epochs: 10
+  clip_range: 0.2
+  gae_lambda: 0.95
+  entropy_coef: 0.01
+  value_loss_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 1000
+
+MountainCar-v0:
+  discount_factor: 0.99
+  epsilon_decay: 0.998
+  learning_rate: 0.0003
+  replay_memory_size: 2048
+  batch_size: 64
+  n_epochs: 10
+  clip_range: 0.2
+  gae_lambda: 0.95
+  entropy_coef: 0.05 # Higher entropy for exploration in sparse reward environment
+  value_loss_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 2000
+
+Pendulum-v1:
+  discount_factor: 0.99
+  epsilon_decay: 0.995
+  learning_rate: 0.0003
+  replay_memory_size: 2048
+  batch_size: 64
+  n_epochs: 10
+  clip_range: 0.2
+  gae_lambda: 0.95
+  entropy_coef: 0.0 # Lower entropy for continuous control
+  value_loss_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 500

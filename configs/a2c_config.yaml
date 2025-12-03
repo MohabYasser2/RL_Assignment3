@@ -1,0 +1,50 @@
+# A2C Configuration for different environments
+# Advantage Actor-Critic algorithm hyperparameters
+
+CartPole-v1:
+  discount_factor: 0.99
+  epsilon_decay: 0.995
+  learning_rate: 0.0007
+  replay_memory_size: 50000
+  batch_size: 64
+  n_steps: 5
+  entropy_coef: 0.01
+  value_loss_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 1000
+
+Acrobot-v1:
+  discount_factor: 0.99
+  epsilon_decay: 0.995
+  learning_rate: 0.0005
+  replay_memory_size: 100000
+  batch_size: 64
+  n_steps: 5
+  entropy_coef: 0.01
+  value_loss_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 2000
+
+MountainCar-v0:
+  discount_factor: 0.99
+  epsilon_decay: 0.998
+  learning_rate: 0.0005
+  replay_memory_size: 100000
+  batch_size: 128
+  n_steps: 10
+  entropy_coef: 0.05
+  value_loss_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 3000
+
+Pendulum-v1:
+  discount_factor: 0.99
+  epsilon_decay: 0.995
+  learning_rate: 0.0003
+  replay_memory_size: 100000
+  batch_size: 64
+  n_steps: 5
+  entropy_coef: 0.01
+  value_loss_coef: 0.5
+  max_grad_norm: 0.5
+  episodes: 1500

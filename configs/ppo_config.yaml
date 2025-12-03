@@ -5,33 +5,33 @@ CartPole-v1:
   # Core PPO hyperparameters (Stable-Baselines3 optimized for CartPole)
   discount_factor: 0.99
   epsilon_decay: 0.995 # unused
-  
+
   # Optimizer
   learning_rate: 0.0003 # 3e-4 works better than 2.5e-4 for CartPole
-  
+
   # Rollout collection - CRITICAL: 128 not 2048!
   replay_memory_size: 128 # Update every 128 steps (not 2048!)
-  
+
   # Minibatching
   batch_size: 32 # 128 / 4 minibatches = 32
   n_epochs: 4 # Number of optimization epochs
-  
+
   # PPO clipping
   clip_range: 0.2
   clip_vloss: true
-  
+
   # GAE
   gae_lambda: 0.95
-  
+
   # Loss coefficients
   entropy_coef: 0.0 # No entropy needed for CartPole (deterministic convergence)
   entropy_coef_final: 0.0
   value_loss_coef: 0.5
   max_grad_norm: 0.5
-  
+
   # Annealing
   total_updates: 10000 # More updates with smaller batches
-  
+
   # Convergence
   convergence_threshold: 475.0
   convergence_window: 100

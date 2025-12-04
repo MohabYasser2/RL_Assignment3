@@ -518,6 +518,7 @@ class A2C:
         return {
             'episode_rewards': episode_rewards,
             'episode_lengths': episode_lengths,
+            'episode_durations': episode_lengths,  # Alias for plotting compatibility
             'mean_reward': np.mean(episode_rewards),
             'std_reward': np.std(episode_rewards),
             'min_reward': np.min(episode_rewards),
